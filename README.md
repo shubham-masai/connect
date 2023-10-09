@@ -11,7 +11,7 @@ It is basically a Student Relationship Management Website. It use to connect peo
 * Manager Page
 * Admin Section
 
-**Netlify :**  [Connect Website](https://connect0.netlify.app/)
+**Netlify :**  [Connect Website](https://652423405a6db4008253afe9--luxury-creponne-43cd52.netlify.app/)
 ## Tech Stack
 
 **Front-End:** HTML | CSS | JavaScript
