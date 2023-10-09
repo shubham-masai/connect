@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/Project/Students/Tasks/Tasks.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <title>Masai Connect</title>
+</head>
+
+<body>
+    <div id="main">
+        <div id="left">
+            <div>
+                <div>
+                    <img src="/Project/Images/Logo.png" id="logo" alt="Masai Connect">
+                </div>
+                <div><span class="material-symbols-outlined">
+                        grid_view
+                    </span>
+                    <p><a href="/Dashboard.html">Dashboard</a></p>
+                </div>
+                <div> <span class="material-symbols-outlined">
+                        person_search
+                    </span>
+                    <p><a href="/Search.html">Search</a></p>
+                </div>
+                <div><span class="material-symbols-outlined">
+                        groups
+                    </span>
+                    <p><a href="" id="must">Groups</a></p>
+                </div>
+                <div id="task123"><span class="material-symbols-outlined">
+
+                        task_alt
+                    </span>
+                    <p><a href="#">Tasks</a></p>
+                </div>
+
+                <div><span class="material-symbols-outlined">
+                        chat
+                    </span>
+                    <p><a href="/Discussion.html">Discussion</a></p>
+                </div>
+
+                <div><span class="material-symbols-outlined">
+                        account_circle
+                    </span>
+                    <p><a href="/Account.html">Account</a></p>
+                </div>
+            </div>
+            <div>
+
+                <div><span class="material-symbols-outlined">
+                        logout
+                    </span>
+                    <p><a href="" id="LogoutBtn">Logout</a></p>
+                </div>
+
+            </div>
+        </div>
+        <div id="right">
+            <div id="r1">
+                <div>
+                    <span class="material-symbols-outlined" id="slide" class="icon">
+                        keyboard_double_arrow_right
+                    </span>
+                </div>
+                <div>
+
+                    <img src="/Project/Images/dark theme icon/moon.png" alt="" id="darkmode_btn" class="icon">
+                    <img src="/Project/Images/man.png" alt="" id="profile">
+                </div>
+            </div>
+            <div>
+                <p>Tasks</p>
+            </div>
+            <div id="t">
+                <div id="t1">
+                    <h2>Ongoing Task</h2>
+                    <div class="container">
+                        <div id="wrapper">
+                            <input type="text" placeholder="Enter Task" id="taskBtn">
+                            <button id="add-btn">ADD</button>
+                        </div>
+                        <div id="tasks">
+                            <p id="pending-tasks">
+                                You have <span class="count-value"> 0 </span> task(s) to Complete.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="t2">
+                    <h2>Completed Task</h2>
+                    <div id="taskDiv"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+</script>
+
+<script>
+    
+    let current = localStorage.getItem("current");
+    let id = localStorage.getItem("userid");
+    document.addEventListener("DOMContentLoaded", function () {
+
+        let studentURL = `https://64b63253df0839c97e151a61.mockapi.io/${current}/${id}`;
+
+        function fetchData1(url) {
+            fetch(url)
+                .then((res) => res.json())
+                .then(function (data) {
+                    mainData = data;
+                    console.log(mainData);
+                    Todos(mainData.todo);
+                });
+        }
+
+        let todoSection = document.getElementById("tasks");
+        let completedSection = document.getElementById("completed-tasks");
+        let taskDiv = document.getElementById("taskDiv");
+        function Todos(arr) {
+            todoSection.innerHTML = "";  
+            let compTask = document.getElementById("t2")
+            taskDiv.innerHTML = ""
+            if (arr.length === 0) {
+                let span = document.createElement("span");
+                span.className = "material-symbols-outlined";
+                span.innerText = "info";
+                span.setAttribute("id", "todoSpan");
+                let p = document.createElement("p");
+                p.innerText = "There is NO Task.";
+                p.setAttribute("id", "todoP");
+                todoSection.append(span, p);
+            } 
+            else {
+                let table = document.createElement("table");
+                let completedTable = document.createElement("table");
+                arr.reverse();
+                arr.forEach(function (el) {
+
+                    let tr = document.createElement("tr");
+                    let td1 = document.createElement("td");
+                    let td2 = document.createElement("td");
+                    let input2Do = document.createElement("input");
+                    input2Do.type = "checkbox";
+                    input2Do.style.height="18px"
+                    input2Do.style.width="18px"
+                    input2Do.style.accentColor="#722ED1"
+
+                    input2Do.checked = el.completed;
+                    input2Do.addEventListener("change", function () {
+                        el.completed = input2Do.checked;
+                        fetch(studentURL, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(mainData)
+                        })
+                            .then((res) => res.json())
+                            .then(function (data) {
+                                console.log("Task status updated successfully!");
+                                Todos(mainData.todo);
+                            })
+                            .catch(function (error) {
+                                console.error("Error updating task status:", error);
+                            });
+                    });
+                    td1.append(input2Do);
+                    td2.innerText = el.task_name;
+                    td2.style.fontSize="18px"
+                    td2.style.padding="10px"
+                    td2.style.textTransform="capitalize";
+                    td2.style.textAlign="Left"
+                    tr.append(td1, td2);
+                    if (el.completed == true) {
+                        completedTable.append(tr);
+
+                    } else {
+                        table.append(tr);
+                    }
+                });
+                todoSection.append(table);
+                taskDiv.append(completedTable)
+            }
+        }
+
+
+        fetchData1(studentURL);
+        let getInput = document.getElementById("taskBtn");
+        let addBtn = document.getElementById("add-btn");
+        addBtn.addEventListener("click", function () {
+            console.log("Adding task...");
+            let newTaskName = getInput.value.trim();
+            if (newTaskName !== "") {
+                let newTask = {
+                    task_name: newTaskName,
+                    completed: false
+                };
+                mainData.todo.push(newTask);
+                fetch(studentURL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(mainData)
+                })
+                    .then((res) => res.json())
+                    .then(function (data) {
+                        console.log("Task added successfully!");
+                        Todos(mainData.todo);
+                    })
+                    .catch(function (error) {
+                        console.error("Error adding task:", error);
+                    });
+            } else {
+                console.log("Please enter a valid task name.");
+            }
+            getInput.value="";
+        });
+    });
+
+    let must = document.getElementById("must");
+    if (current == "Students") {
+        must.href = "/StudentGroup.html";
+    } else {
+        must.href = "/Manager-Group.html";
+    }
+   
+   
+    let LogoutBtn = document.getElementById("LogoutBtn");   
+    LogoutBtn.addEventListener("click", async function (event) {
+        event.preventDefault();
+        
+        let status = false;
+        try {
+            let res = await fetch(`https://64b63253df0839c97e151a61.mockapi.io/api/admin/${current}/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ active: status }),
+            });
+            window.location.href = "/index.html";
+        } catch (error) {
+            console.log(error);
+        }
+    });
+    let visible = true;
+    let slidebtn = document.getElementById("slide");
+    let slide = document.getElementById("left");
+    slidebtn.addEventListener("click", function () {
+        if (visible == true) {
+            slide.style.display = 'none'
+            visible = false;
+            right.style.width = '100%';
+
+        }
+        else if (visible == false) {
+            slide.style.display = 'flex'
+            visible = true;
+            right.style.width = '86%';
+        }
+    })
+    // Dark Mode
+    if (localStorage.getItem("darkmode") === null) {
+        localStorage.setItem("darkmode", "false");
+    }
+
+    function enableDarkMode() {
+        document.body.classList.add("dark-mode");
+        const darkButton = document.getElementById("darkmode_btn");
+        const slideBtn = document.getElementById("slide");
+        darkButton.src = "/Project/Images/dark theme icon/sun.png";
+        slideBtn.style.color = "white";
+    }
+
+
+    function disableDarkMode() {
+        document.body.classList.remove("dark-mode");
+        const darkButton = document.getElementById("darkmode_btn");
+        const slideBtn = document.getElementById("slide");
+        darkButton.src = "/Project/Images/dark theme icon/moon.png";
+        slideBtn.style.color = "black";
+    }
+
+
+    function toggleDarkMode() {
+        if (localStorage.getItem("darkmode") === "true") {
+            enableDarkMode();
+        } else {
+            disableDarkMode();
+        }
+    }
+
+    document.getElementById("darkmode_btn").addEventListener("click", function () {
+        if (localStorage.getItem("darkmode") === "false") {
+            localStorage.setItem("darkmode", "true")
+            enableDarkMode();
+        } else if (localStorage.getItem("darkmode") === "true") {
+            localStorage.setItem("darkmode", "false")
+            disableDarkMode();
+        }
+        toggleDarkMode();
+    });
+
+    toggleDarkMode();
+</script>
